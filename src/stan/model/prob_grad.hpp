@@ -18,17 +18,20 @@ namespace stan {
     protected:
       size_t num_params_r__;
       std::vector<std::pair<int, int> > param_ranges_i__;
+      double alpha__;
 
     public:
       explicit prob_grad(size_t num_params_r)
         : num_params_r__(num_params_r),
-          param_ranges_i__(std::vector<std::pair<int, int> >(0)) {
+          param_ranges_i__(std::vector<std::pair<int, int> >(0)),
+          alpha__ (1.0) {
       }
 
       prob_grad(size_t num_params_r,
                 std::vector<std::pair<int, int> >& param_ranges_i)
         : num_params_r__(num_params_r),
-          param_ranges_i__(param_ranges_i) {
+          param_ranges_i__(param_ranges_i),
+          alpha__ (1.0) {
       }
 
       virtual ~prob_grad() { }
@@ -43,6 +46,10 @@ namespace stan {
 
       inline std::pair<int, int> param_range_i(size_t idx) const {
         return param_ranges_i__[idx];
+      }
+
+      inline void set_alpha (double a) {
+        alpha__ = a;
       }
     };
   }

@@ -6,6 +6,7 @@
 #include <stan/services/arguments/arg_optimize.hpp>
 #include <stan/services/arguments/arg_variational.hpp>
 #include <stan/services/arguments/arg_diagnose.hpp>
+#include <stan/services/arguments/arg_bdmc.hpp>
 
 namespace stan {
   namespace services {
@@ -20,6 +21,7 @@ namespace stan {
         _values.push_back(new arg_optimize());
         _values.push_back(new arg_variational());
         _values.push_back(new arg_diagnose());
+        _values.push_back(new arg_bdmc());
 
         _default_cursor = 0;
         _cursor = _default_cursor;
