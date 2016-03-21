@@ -27,13 +27,13 @@ namespace stan {
 			file.write(reinterpret_cast<char*> (&vars_data_size), sizeof vars_data_size);
 
 
-			for (int i = 0; i < vars_prior_params.size(); i++)
+			for (size_t i = 0; i < vars_prior_params.size(); i++)
 				file.write(reinterpret_cast<char*> (&vars_prior_params[i]), sizeof vars_prior_params[i]);
 			
-			for (int i = 0; i < vars_posterior_params.size(); i++)
+			for (size_t i = 0; i < vars_posterior_params.size(); i++)
 				file.write(reinterpret_cast<char*> (&vars_posterior_params[i]), sizeof vars_posterior_params[i]);
 
-			for (int i = 0; i < vars_data.size(); i++)
+			for (size_t i = 0; i < vars_data.size(); i++)
 				file.write(reinterpret_cast<char*> (&vars_data[i]), sizeof vars_data[i]);
 
 			file.close();
