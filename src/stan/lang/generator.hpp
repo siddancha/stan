@@ -4191,8 +4191,8 @@ namespace stan {
 
 
     struct write_array_vars_visgen : public visgen {
-      const std::string& channel_str_;
-      explicit write_array_vars_visgen(const std::string& channel_str, 
+      std::string channel_str_;
+      explicit write_array_vars_visgen(std::string channel_str, 
                                        std::ostream& o)
         : visgen(o),
           channel_str_(channel_str) {
@@ -4265,7 +4265,7 @@ namespace stan {
         matdims.push_back(x.K_);
         write_array(channel_str_, x.name_, x.dims_, matdims);
       }
-      void write_array(const std::string& channel_str,
+      void write_array(std::string channel_str,
                        const std::string& name,
                        const std::vector<expression>& arraydims,
                        const std::vector<expression>& matdims) const {
