@@ -12,7 +12,7 @@ namespace stan {
 													  std::vector<double>& vars_prior_params,
 													  std::vector<double>& vars_posterior_params,
 													  std::vector<double>& vars_data) {
-			std::ofstream file(filename, std::ofstream::binary);
+			std::ofstream file(filename.c_str(), std::ofstream::binary);
 			if (!file.is_open()) {
 				std::cerr << "Could not open file - " << filename << std::endl;
 				exit(1);
@@ -62,7 +62,7 @@ namespace stan {
 													  std::vector<double>& vars_data,
 													  Model& model) {
 
-			std::ifstream file(filename, std::ifstream::binary);
+			std::ifstream file(filename.c_str(), std::ifstream::binary);
 			if (!file.is_open()) {
 				std::cerr << "Could not open file - " << filename << std::endl;
 				exit(1);
