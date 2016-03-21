@@ -12,7 +12,7 @@ namespace stan {
 													  std::vector<double>& vars_prior_params,
 													  std::vector<double>& vars_posterior_params,
 													  std::vector<double>& vars_data) {
-			std::ofstream file(filename, std::ios::binary);
+			std::ofstream file(filename, std::ofstream::binary);
 			if (!file.is_open()) {
 				std::cerr << "Could not open file - " << filename << std::endl;
 				exit(1);
@@ -62,7 +62,7 @@ namespace stan {
 													  std::vector<double>& vars_data,
 													  Model& model) {
 
-			std::ifstream file(filename, std::ios::binary);
+			std::ifstream file(filename, std::ifstream::binary);
 			if (!file.is_open()) {
 				std::cerr << "Could not open file - " << filename << std::endl;
 				exit(1);
@@ -72,18 +72,18 @@ namespace stan {
 			size_t size = 0;
 			std::vector<std::vector<size_t> > param_dims;
 			model.get_param_dims(param_dims);
-			for (int i = 0; i < param_dims.size(); i++) {
+			for (size_t i = 0; i < param_dims.size(); i++) {
 				size_t m_size = 1;
-				for (int j = 0; j < param_dims[i].size(); j++)
+				for (size_t j = 0; j < param_dims[i].size(); j++)
 					m_size *= param_dims[i][j];
 				size += m_size;
 			}
 			size *= 2;
 			std::vector<std::vector<size_t> > data_dims;
 			model.get_data_dims(data_dims);
-			for (int i = 0; i < data_dims.size(); i++) {
+			for (size_t i = 0; i < data_dims.size(); i++) {
 				size_t m_size = 1;
-				for (int j = 0; j < data_dims[i].size(); j++)
+				for (size_t j = 0; j < data_dims[i].size(); j++)
 					m_size *= data_dims[i][j];
 				size += m_size;
 			}
