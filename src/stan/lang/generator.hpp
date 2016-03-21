@@ -239,7 +239,7 @@ namespace stan {
       varname_from_expr_vis vis_expr;
       std::string var_expr = boost::apply_visitor(vis_expr, expr.expr_);
       if (var_expr.empty()) return false;
-      for (int i = 0; i < current_prog.data_decl_.size(); i++) {
+      for (size_t i = 0; i < current_prog.data_decl_.size(); i++) {
         varname_from_decl_vis vis_decl;
         std::string var_decl =  boost::apply_visitor(vis_decl,
           current_prog.data_decl_[i].decl_);
