@@ -4191,8 +4191,8 @@ namespace stan {
 
 
     struct write_array_vars_visgen : public visgen {
-      std::string& channel_str_;
-      explicit write_array_vars_visgen(std::string& channel_str, 
+      const std::string& channel_str_;
+      explicit write_array_vars_visgen(const std::string& channel_str, 
                                        std::ostream& o)
         : visgen(o),
           channel_str_(channel_str) {
