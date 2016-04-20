@@ -19,12 +19,17 @@ namespace stan {
 		NOTE: sampler should be initialized with the same instance
 		of the model.
 		*/
-		template <class Model, class RNG>
+		template <class Model, class RNG, class SampleRecorder,
+							class DiagnosticRecorder, class MessageRecorder>
 		double ais(stan::mcmc::base_mcmc* sampler,
 							 int num_steps,
 							 schedule &sch,
 							 stan::mcmc::sample& init_s,
 							 Model& model,
+							 bool save,
+							 stan::services::sample::mcmc_writer<
+               Model, SampleRecorder, DiagnosticRecorder, MessageRecorder>&
+               mcmc_writer,
 							 RNG& base_rng,
 							 progress_bar& bdmc_progress,
 							 int iter_index,
@@ -40,6 +45,9 @@ namespace stan {
 				double prev_log_prob;
 				Eigen::VectorXd cont_params;
 				init_s.cont_params(cont_params);
+
+				if ( save )
+					mcmc_writer.write_sample_params(base_rng, init_s, *sampler, model);
 
 				// calculating f_{t-1}(x_{t-1})
 				model.set_alpha(sch.alpha(k-1, num_steps));
@@ -75,12 +83,17 @@ namespace stan {
 		NOTE: sampler should be initialized with the same instance
 		of the model.
 		*/
-		template <class Model, class RNG>
+		template <class Model, class RNG, class SampleRecorder,
+							class DiagnosticRecorder, class MessageRecorder>
 		double rais(stan::mcmc::base_mcmc* sampler,
 						 	  int num_steps,
 						 	  schedule& sch,
 							  stan::mcmc::sample& init_s,
 							  Model& model,
+							  bool save,
+							  stan::services::sample::mcmc_writer<
+                Model, SampleRecorder, DiagnosticRecorder, MessageRecorder>&
+                mcmc_writer,
 							  RNG& base_rng,
 							  progress_bar& bdmc_progress,
 							  int iter_index,
@@ -96,6 +109,9 @@ namespace stan {
 				double prev_log_prob;
 				Eigen::VectorXd cont_params;
 				init_s.cont_params(cont_params);
+
+				if ( save )
+					mcmc_writer.write_sample_params(base_rng, init_s, *sampler, model);
 
 				// calculating f_{t-1}(x_{t-1})
 				model.set_alpha(sch.alpha(k, num_steps));

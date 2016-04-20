@@ -10,6 +10,7 @@
 #include <stan/services/arguments/arg_schedule.hpp>
 #include <stan/services/arguments/arg_num_data.hpp>
 #include <stan/services/arguments/arg_exact_sample.hpp>
+#include <stan/services/arguments/arg_save_samples.hpp>
 
 namespace stan {
   namespace services {
@@ -22,6 +23,7 @@ namespace stan {
 
         _subarguments.push_back(new arg_ais());
         _subarguments.push_back(new arg_rais());
+        _subarguments.push_back(new arg_save_samples());
         _subarguments.push_back(new arg_schedule());
         _subarguments.push_back(new arg_adapt());
         _subarguments.push_back(new arg_sample_algo());
