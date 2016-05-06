@@ -99,10 +99,11 @@ namespace stan {
 				if (is_complete_) return;
 				double p = raw_progress(num_iter_index, weight_index,
 													 			step_index, is_ais);
-				int prev_percent = percent_;
-				percent_ = 100.0 * (p/load_);
-				if (percent_ != prev_percent)
+				int new_percent = 100.0 * (p/load_);
+				if (percent_ != new_percent) {
+					percent_ = new_percent;
 					make_bar();
+				}
 			}
 		};
 	}

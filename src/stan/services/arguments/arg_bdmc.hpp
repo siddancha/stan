@@ -6,6 +6,7 @@
 #include <stan/services/arguments/arg_iterations.hpp>
 #include <stan/services/arguments/arg_rais.hpp>
 #include <stan/services/arguments/arg_adapt.hpp>
+#include <stan/services/arguments/arg_num_warmup.hpp>
 #include <stan/services/arguments/arg_sample_algo.hpp>
 #include <stan/services/arguments/arg_schedule.hpp>
 #include <stan/services/arguments/arg_num_data.hpp>
@@ -26,6 +27,7 @@ namespace stan {
         _subarguments.push_back(new arg_save_samples());
         _subarguments.push_back(new arg_schedule());
         _subarguments.push_back(new arg_adapt());
+        _subarguments.push_back(new arg_num_warmup());
         _subarguments.push_back(new arg_sample_algo());
         _subarguments.push_back(new arg_iterations());
         _subarguments.push_back(new arg_num_data());

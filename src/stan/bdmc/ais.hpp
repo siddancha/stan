@@ -66,8 +66,7 @@ namespace stan {
 
 				init_s = sampler->transition(init_s, writer);
 				
-				if (k == 1 || k == num_steps || k%1000 == 0)
-					bdmc_progress.progress(iter_index, weight_index, k, true);
+				bdmc_progress.progress(iter_index, weight_index, k, true);
 			}
 			model.set_alpha(1.0);
 			return weight;
@@ -130,8 +129,7 @@ namespace stan {
 
 				init_s = sampler->transition(init_s, writer);
 
-				if (k == 1 || k == num_steps || k%1000 == 0)
-					bdmc_progress.progress(iter_index, weight_index, num_steps-k+1, false);
+				bdmc_progress.progress(iter_index, weight_index, num_steps-k+1, false);
 			}
 			model.set_alpha(1.0);
 			return -1.0*weight;
