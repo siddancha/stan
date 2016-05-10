@@ -3574,11 +3574,11 @@ namespace stan {
       o << INDENT << "}" << EOL2;
     }
 
-    void generate_data_dims_method(const program& prog,
-                              std::ostream& o) {
+    void generate_data_r_dims_method(const program& prog,
+                                     std::ostream& o) {
       write_dims_visgen vis(o);
       o << EOL << INDENT
-        << "void get_data_dims(std::vector<std::vector<size_t> >& dimss__) const {"
+        << "void get_data_r_dims(std::vector<std::vector<size_t> >& dimss__) const {"
         << EOL;
 
       o << INDENT2 << "dimss__.resize(0);" << EOL;
@@ -3586,7 +3586,26 @@ namespace stan {
 
       // data
       for (size_t i = 0; i < prog.data_decl_.size(); ++i) {
-        boost::apply_visitor(vis, prog.data_decl_[i].decl_);
+        if (prog.data_decl_[i].base_decl().base_type_ != INT_T)
+          boost::apply_visitor(vis, prog.data_decl_[i].decl_);
+      }
+      o << INDENT << "}" << EOL2;
+    }
+
+    void generate_data_i_dims_method(const program& prog,
+                                     std::ostream& o) {
+      write_dims_visgen vis(o);
+      o << EOL << INDENT
+        << "void get_data_i_dims(std::vector<std::vector<size_t> >& dimss__) const {"
+        << EOL;
+
+      o << INDENT2 << "dimss__.resize(0);" << EOL;
+      o << INDENT2 << "std::vector<size_t> dims__;" << EOL;
+
+      // data
+      for (size_t i = 0; i < prog.data_decl_.size(); ++i) {
+        if (prog.data_decl_[i].base_decl().base_type_ == INT_T)
+          boost::apply_visitor(vis, prog.data_decl_[i].decl_);
       }
       o << INDENT << "}" << EOL2;
     }
@@ -3673,12 +3692,12 @@ namespace stan {
       o << INDENT << "}" << EOL2;
     }
 
-    void generate_data_names_method (const program& prog,
-                                     std::ostream &o) {
+    void generate_data_r_names_method (const program& prog,
+                                       std::ostream &o) {
 
       write_param_names_visgen vis(o);
       o << EOL << INDENT
-        << "void get_data_names(std::vector<std::string>& names__) const {"
+        << "void get_data_r_names(std::vector<std::string>& names__) const {"
         << EOL;
 
       o << INDENT2
@@ -3687,7 +3706,29 @@ namespace stan {
 
       // data
       for (size_t i = 0; i < prog.data_decl_.size(); ++i) {
-        boost::apply_visitor(vis, prog.data_decl_[i].decl_);
+        if (prog.data_decl_[i].base_decl().base_type_ != INT_T)
+          boost::apply_visitor(vis, prog.data_decl_[i].decl_);
+      }
+
+      o << INDENT << "}" << EOL2;
+    }
+
+    void generate_data_i_names_method (const program& prog,
+                                       std::ostream &o) {
+
+      write_param_names_visgen vis(o);
+      o << EOL << INDENT
+        << "void get_data_i_names(std::vector<std::string>& names__) const {"
+        << EOL;
+
+      o << INDENT2
+        << "names__.resize(0);"
+        << EOL;
+
+      // data
+      for (size_t i = 0; i < prog.data_decl_.size(); ++i) {
+        if (prog.data_decl_[i].base_decl().base_type_ == INT_T)
+          boost::apply_visitor(vis, prog.data_decl_[i].decl_);
       }
 
       o << INDENT << "}" << EOL2;
@@ -4437,16 +4478,13 @@ namespace stan {
         o << INDENT << "template <typename RNG>" << EOL;
         o << INDENT << "void exact_sample(RNG& base_rng__," << EOL;
         o << INDENT << "                  std::vector<double>& vars_param__," << EOL;
-        o << INDENT << "                  std::vector<double>& vars_data__) const {" << EOL2;
-       
+        o << INDENT << "                  std::vector<double>& vars_data_r__," << EOL;
+        o << INDENT << "                  std::vector<int>& vars_data_i__) {" << EOL2;
+              
         bool is_var = false;
         bool is_fun_return = false; 
         bool include_sampling = true;
         bool is_sampling_rng = true;
-        
-        generate_comment("declare data variables", 2, o);
-        generate_local_var_decls(prog.data_decl_, 2, o,
-                                 is_var, is_fun_return);
 
         o << EOL;
         generate_comment("declare model parameters", 2, o);
@@ -4460,8 +4498,7 @@ namespace stan {
         o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning";
 
         generate_init_vars(prog.parameter_decl_, 2, o);
-        generate_init_vars(prog.data_decl_, 2, o);
-
+        
         o << EOL2;
         generate_comment("model body", 2, o);
         generate_located_statement(prog.statement_, 2, o, include_sampling,
@@ -4475,9 +4512,15 @@ namespace stan {
         o << EOL;
 
         generate_comment("write data vars", 2, o);
-        write_array_vars_visgen vis_data_writer("vars_data__", o);
-        for (size_t i = 0; i < prog.data_decl_.size(); ++i)
-          boost::apply_visitor(vis_data_writer, prog.data_decl_[i].decl_);
+        write_array_vars_visgen vis_data_r_writer("vars_data_r__", o);
+        write_array_vars_visgen vis_data_i_writer("vars_data_i__", o);
+        for (size_t i = 0; i < prog.data_decl_.size(); ++i) {
+          base_expr_type base_type = prog.data_decl_[i].base_decl().base_type_;
+          if (base_type == INT_T)
+            boost::apply_visitor(vis_data_i_writer, prog.data_decl_[i].decl_);
+          else
+            boost::apply_visitor(vis_data_r_writer, prog.data_decl_[i].decl_);
+        }
         o << EOL;
 
         o << INDENT << "}" << EOL2;
@@ -4914,10 +4957,12 @@ namespace stan {
       generate_log_prob(prog, out);
       generate_exact_sample(prog, out);
       generate_param_names_method(prog, out);
-      generate_data_names_method(prog, out);
+      generate_data_r_names_method(prog, out);
+      generate_data_i_names_method(prog, out);
       generate_dims_method(prog, out);
       generate_param_dims_method(prog, out);
-      generate_data_dims_method(prog, out);
+      generate_data_r_dims_method(prog, out);
+      generate_data_i_dims_method(prog, out);
       generate_write_array_method(prog, model_name, out);
       generate_model_name_method(model_name, out);
       generate_constrained_param_names_method(prog, out);

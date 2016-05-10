@@ -11,7 +11,8 @@ namespace stan {
 		void save_exact_sample (std::string filename,
 													  std::vector<double>& vars_prior_params,
 													  std::vector<double>& vars_posterior_params,
-													  std::vector<double>& vars_data) {
+													  std::vector<double>& vars_data_r,
+													  std::vector<int>& vars_data_i) {
 			std::ofstream file(filename.c_str(), std::ofstream::binary);
 			if (!file.is_open()) {
 				std::cerr << "Could not open file - " << filename << std::endl;
@@ -20,11 +21,13 @@ namespace stan {
 
 			int vars_prior_params_size = vars_prior_params.size();
 			int vars_posterior_params_size = vars_posterior_params.size();
-			int vars_data_size = vars_data.size();
+			int vars_data_r_size = vars_data_r.size();
+			int vars_data_i_size = vars_data_i.size();
 
 			file.write(reinterpret_cast<char*> (&vars_prior_params_size), sizeof vars_prior_params_size);
 			file.write(reinterpret_cast<char*> (&vars_posterior_params_size), sizeof vars_posterior_params_size);
-			file.write(reinterpret_cast<char*> (&vars_data_size), sizeof vars_data_size);
+			file.write(reinterpret_cast<char*> (&vars_data_r_size), sizeof vars_data_r_size);
+			file.write(reinterpret_cast<char*> (&vars_data_i_size), sizeof vars_data_i_size);
 
 
 			for (size_t i = 0; i < vars_prior_params.size(); i++)
@@ -33,8 +36,11 @@ namespace stan {
 			for (size_t i = 0; i < vars_posterior_params.size(); i++)
 				file.write(reinterpret_cast<char*> (&vars_posterior_params[i]), sizeof vars_posterior_params[i]);
 
-			for (size_t i = 0; i < vars_data.size(); i++)
-				file.write(reinterpret_cast<char*> (&vars_data[i]), sizeof vars_data[i]);
+			for (size_t i = 0; i < vars_data_r.size(); i++)
+				file.write(reinterpret_cast<char*> (&vars_data_r[i]), sizeof vars_data_r[i]);
+
+			for (size_t i = 0; i < vars_data_i.size(); i++)
+				file.write(reinterpret_cast<char*> (&vars_data_i[i]), sizeof vars_data_i[i]);
 
 			file.close();
 
@@ -59,7 +65,8 @@ namespace stan {
 		void load_exact_sample (std::string filename,
 													  std::vector<double>& vars_prior_params,
 													  std::vector<double>& vars_posterior_params,
-													  std::vector<double>& vars_data,
+													  std::vector<double>& vars_data_r,
+													  std::vector<int>& vars_data_i,
 													  Model& model) {
 
 			std::ifstream file(filename.c_str(), std::ifstream::binary);
@@ -76,19 +83,26 @@ namespace stan {
 				size_t m_size = 1;
 				for (size_t j = 0; j < param_dims[i].size(); j++)
 					m_size *= param_dims[i][j];
-				size += m_size;
+				size += m_size * sizeof(double);
 			}
 			size *= 2;
-			std::vector<std::vector<size_t> > data_dims;
-			model.get_data_dims(data_dims);
-			for (size_t i = 0; i < data_dims.size(); i++) {
+			std::vector<std::vector<size_t> > data_r_dims;
+			model.get_data_r_dims(data_r_dims);
+			for (size_t i = 0; i < data_r_dims.size(); i++) {
 				size_t m_size = 1;
-				for (size_t j = 0; j < data_dims[i].size(); j++)
-					m_size *= data_dims[i][j];
-				size += m_size;
+				for (size_t j = 0; j < data_r_dims[i].size(); j++)
+					m_size *= data_r_dims[i][j];
+				size += m_size * sizeof(double);
 			}
-			size *= sizeof(double);
-			size += 3 * sizeof(int);
+			std::vector<std::vector<size_t> > data_i_dims;
+			model.get_data_i_dims(data_i_dims);
+			for (size_t i = 0; i < data_i_dims.size(); i++) {
+				size_t m_size = 1;
+				for (size_t j = 0; j < data_i_dims[i].size(); j++)
+					m_size *= data_i_dims[i][j];
+				size += m_size * sizeof(int);
+			}
+			size += 4 * sizeof(int);
 
 			file.seekg(0, file.end);
 			size_t filesize = file.tellg();
@@ -105,15 +119,18 @@ namespace stan {
 
 			vars_prior_params.clear();
 			vars_posterior_params.clear();
-			vars_data.clear();
+			vars_data_r.clear();
+			vars_data_i.clear();
 
 			int vars_prior_params_size;
 			int vars_posterior_params_size;
-			int vars_data_size;
+			int vars_data_r_size;
+			int vars_data_i_size;
 
 			file.read(reinterpret_cast<char*> (&vars_prior_params_size), sizeof vars_prior_params_size);
 			file.read(reinterpret_cast<char*> (&vars_posterior_params_size), sizeof vars_posterior_params_size);
-			file.read(reinterpret_cast<char*> (&vars_data_size), sizeof vars_data_size);
+			file.read(reinterpret_cast<char*> (&vars_data_r_size), sizeof vars_data_r_size);
+			file.read(reinterpret_cast<char*> (&vars_data_i_size), sizeof vars_data_i_size);
 
 			for (int i = 0; i < vars_prior_params_size; i++) {
 				double val;
@@ -127,10 +144,16 @@ namespace stan {
 				vars_posterior_params.push_back(val);
 			}
 
-			for (int i = 0; i < vars_data_size; i++) {
+			for (int i = 0; i < vars_data_r_size; i++) {
 				double val;
 				file.read(reinterpret_cast<char*> (&val), sizeof val);
-				vars_data.push_back(val);
+				vars_data_r.push_back(val);
+			}
+
+			for (int i = 0; i < vars_data_i_size; i++) {
+				int val;
+				file.read(reinterpret_cast<char*> (&val), sizeof val);
+				vars_data_i.push_back(val);
 			}
 
 			file.close();

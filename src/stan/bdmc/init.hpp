@@ -13,22 +13,31 @@ namespace stan {
     template <class Model, class RNG>
     void sample_data_and_params (Model& model,
                                  std::vector<double>& vars_param,
-                                 std::vector<double>& vars_data,
+                                 std::vector<double>& vars_data_r,
+                                 std::vector<int>& vars_data_i,
                                  RNG& base_rng) {
-      model.exact_sample(base_rng, vars_param, vars_data);
+      model.exact_sample(base_rng, vars_param, vars_data_r, vars_data_i);
     }
 
     template <class Model>
     void set_data (Model& model,
-                   std::vector<double>& vars_data) {
+                   std::vector<double>& vars_data_r,
+                   std::vector<int>& vars_data_i) {
       // Creating var_context for exact data sample.
-      std::vector<std::string> data_var_names;
-      std::vector<std::vector<size_t> > data_dims;
-      model.get_data_names(data_var_names);
-      model.get_data_dims(data_dims);
-      stan::io::array_var_context exact_data_context(data_var_names,
-                                                     vars_data,
-                                                     data_dims);
+      std::vector<std::string> data_var_r_names;
+      std::vector<std::string> data_var_i_names;
+      std::vector<std::vector<size_t> > data_r_dims;
+      std::vector<std::vector<size_t> > data_i_dims;
+      model.get_data_r_names(data_var_r_names);
+      model.get_data_i_names(data_var_i_names);
+      model.get_data_r_dims(data_r_dims);
+      model.get_data_i_dims(data_i_dims);
+      stan::io::array_var_context exact_data_context(data_var_r_names,
+                                                     vars_data_r,
+                                                     data_r_dims,
+                                                     data_var_i_names,
+                                                     vars_data_i,
+                                                     data_i_dims);
       // Creating new model with exact data sample.
       model = Model(exact_data_context, &std::cout);
     }
