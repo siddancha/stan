@@ -12,8 +12,8 @@ namespace stan {
         _name = "num_iter";
         _description = "Number of iterations of experiment";
         _validity = "0 <= num_weights";
-        _default = "10";
-        _default_value = 10;
+        _default = "1";
+        _default_value = 1;
         _constrained = true;
         _good_value = 2.0;
         _bad_value = -1.0;
