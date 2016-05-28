@@ -9,7 +9,6 @@
 #include <stan/services/arguments/arg_num_warmup.hpp>
 #include <stan/services/arguments/arg_sample_algo.hpp>
 #include <stan/services/arguments/arg_schedule.hpp>
-#include <stan/services/arguments/arg_num_data.hpp>
 #include <stan/services/arguments/arg_exact_sample.hpp>
 #include <stan/services/arguments/arg_save_samples.hpp>
 
@@ -30,7 +29,6 @@ namespace stan {
         _subarguments.push_back(new arg_num_warmup());
         _subarguments.push_back(new arg_sample_algo());
         _subarguments.push_back(new arg_iterations());
-        _subarguments.push_back(new arg_num_data());
         _subarguments.push_back(new arg_exact_sample());
       }
     };
