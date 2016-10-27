@@ -3,7 +3,8 @@
 
 #include <stan/services/arguments/categorical_argument.hpp>
 
-#include <stan/services/arguments/arg_load_file.hpp>
+#include <stan/services/arguments/arg_load_posterior_file.hpp>
+#include <stan/services/arguments/arg_load_prior_file.hpp>
 #include <stan/services/arguments/arg_save_file.hpp>
 
 namespace stan {
@@ -15,7 +16,8 @@ namespace stan {
         _name = "exact_sample";
         _description = "Options to save and load exact samples";
 
-        _subarguments.push_back(new arg_load_file());      
+        _subarguments.push_back(new arg_load_prior_file());
+        _subarguments.push_back(new arg_load_posterior_file());      
         _subarguments.push_back(new arg_save_file());
       }
     };
